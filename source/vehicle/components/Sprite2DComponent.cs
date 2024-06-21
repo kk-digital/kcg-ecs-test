@@ -1,6 +1,4 @@
 using Entitas;
-// KMath;
-//using Sprites;
 
 namespace Vehicle
 {
@@ -11,8 +9,5 @@ namespace Vehicle
         public int ThrusterSpriteId;
         public int Width;
         public int Height;
-        //public TexCoords Coords;
-
-        //public Vec2f Size => new Vec2f(Width, Height);
     }
 }

@@ -72,45 +72,4 @@ sysinfo.txt
 #Do we need zips/rars?
 #*.zip
 *.rar
-
-# test output specific ignores
-tileset-test-output/
-assets/spine/flitter/images/Bottom Leg.png.import
-assets/spine/flitter/images/Bottom Leg02.png.import
-assets/spine/flitter/images/Eye.png.import
-assets/spine/flitter/images/Smear.png.import
-assets/spine/flitter/images/TopLeg.png.import
-assets/spine/flitter/images/TopLeg02.png.import
-assets/spine/flitter/images/Wing.png.import
-assets/spine/flitter/images/Body.png.import
-assets/spine/aracne/Aracne.png.import
-assets/spine/aracne/images/Back arm.png.import
-assets/spine/aracne/images/back paw.png.import
-assets/spine/aracne/images/Base.png.import
-assets/spine/aracne/images/carapace.png.import
-assets/spine/aracne/images/Front Arm.png.import
-assets/spine/aracne/images/lower back paw.png.import
-assets/spine/aracne/images/Lower front claw hand.png.import
-assets/spine/aracne/images/Lower front claw.png.import
-assets/spine/aracne/images/Lower middle paw.png.import
-assets/spine/aracne/images/Middle Paw.png.import
-assets/spine/aracne/images/Smear Final.png.import
-assets/spine/aracne/images/Smear.png.import
-assets/spine/aracne/images/Web.png.import
-assets/spine/bird/images/Body.png.import
-assets/spine/bird/images/Eye.png.import
-assets/spine/bird/images/Feet01.png.import
-assets/spine/bird/images/Feet02.png.import
-assets/spine/bird/images/Head.png.import
-assets/spine/bird/images/Peck.png.import
-assets/spine/bird/images/Peck02.png.import
-assets/spine/bird/images/Tail.png.import
-assets/spine/bird/images/Wing01 Open.png.import
-assets/spine/bird/images/Wing01.png.import
-assets/spine/bird/images/Wing02 Open.png.import
-assets/spine/bird/images/Wing02.png.import
-assets/ui/textures/characterCreator/base_parts02onlychromagreen.png.import
-assets/ui/textures/characterCreator/base_parts02onlylumanoblend.png.import
-assets/ui/textures/characterCreator/base_parts02onlyoutlinenoblend.png.import
-
 *.csproj.old.*

@@ -1,5 +1,4 @@
 using Entitas;
-//using KMath;
 
 namespace Particle
 {
@@ -7,7 +6,9 @@ namespace Particle
     public class Box2DColliderComponent : IComponent
     {
         public int Test;
-        //public Vec2f Size;
-        //public Vec2f Offset;
+        public float OffSetX;
+        public float OffsetY;
+        public float Width;
+        public float Height;
     }
 } 

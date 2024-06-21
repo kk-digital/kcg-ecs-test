@@ -6,6 +6,5 @@ namespace Particle
     public class BaseComponent : IComponent
     {
         public int Index;
-        //public ParticleType ParticleType;
     }
 }

@@ -6,18 +6,10 @@
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
-
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
       <OutputPath>../build/debug/</OutputPath>
     </PropertyGroup>
-
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <OutputPath>../build/release/</OutputPath>
     </PropertyGroup>
-	
-	<ItemGroup>
-    <ProjectReference Include="..\source\globals\globals.csproj" />
-  </ItemGroup>
-
-
 </Project>
