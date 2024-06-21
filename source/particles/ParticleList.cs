@@ -1,3 +1,5 @@
+using Xunit;
+
 namespace Particle
 {
     // Don't use entitas internal lists because they don't have deterministic order.
@@ -61,7 +63,7 @@ namespace Particle
 
                 // make sure the new capacity 
                 // is bigget than the old one
-                Assert.IsBigger()(NewCapacity > Capacity);
+                Assert.True(NewCapacity > Capacity);
                 Capacity = NewCapacity;
                 System.Array.Resize(ref List, Capacity);
             }
