@@ -1,14 +1,15 @@
-# Entitas-Standalone
+There are Three project in the solution:
 
-Entitas-Standalone is a pure C# console app using [Entitas](https://github.com/sschmid/Entitas).
+## src/kcg-ecs-test.csproj
+This is a minimal sample project using to test our entitas verison
 
-There are two project in the solution:
-
-## src/MyProject.csproj
-This is a minimal sample project using one generated component.
-
-## jenny/MyProject.Jenny.csproj
+## jenny/RunCodeGenerator.Jenny.csproj
 Use this project to build the code generator called Jenny.
+
+## customEntitas/
+This is the custom version of entitas that we are using. It is a fork of the original entitas project.
+Custom Entitas is going to be modified removing functionality that we don't need. Making it more lightweight
+custom Entitas should make generator code be para of same namespace of the component.
 
 To start the server please run:
 
@@ -31,10 +32,4 @@ or
 ```
 dotnet run -c Release --project jenny/RunCodeGenerator.csproj gen
 ```
-
-
-# Goals
-
-[] Create custom version of entitas removing functionality that we don't need.
-[] Generator code should be inside a specified namespace one for each component type.
 
