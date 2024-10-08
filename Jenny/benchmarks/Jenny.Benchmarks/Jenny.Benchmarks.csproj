@@ -5,11 +5,14 @@
     <TargetFramework>$(DefaultNetTargetFramework)</TargetFramework>
     <IsPackable>false</IsPackable>
     <IsPublishable>false</IsPublishable>
-    <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Jenny\src\Jenny.Generator.Cli\Jenny.Generator.Cli.csproj" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Jenny/Jenny.csproj" />
   </ItemGroup>
 
 </Project>

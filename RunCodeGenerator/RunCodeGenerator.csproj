@@ -8,11 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jenny.Generator.Cli" Version="1.*" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\customEntitas\src\Entitas.Roslyn.CodeGeneration.Plugins\src\Entitas.Roslyn.CodeGeneration.Plugins.csproj" />
+    <ProjectReference Include="..\Jenny\src\Jenny.Generator.Cli\Jenny.Generator.Cli.csproj" />
   </ItemGroup>
 
 </Project>
