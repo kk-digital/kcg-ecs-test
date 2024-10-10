@@ -8,7 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Sherlog.Appenders" Version="1.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\customEntitas\src\Entitas.CodeGeneration.Plugins\src\Entitas.CodeGeneration.Plugins.csproj" />
     <ProjectReference Include="..\Jenny\src\Jenny.Generator.Cli\Jenny.Generator.Cli.csproj" />
+    <ProjectReference Include="..\Jenny\src\Jenny.Plugins\Jenny.Plugins.csproj" />
   </ItemGroup>
 
 </Project>

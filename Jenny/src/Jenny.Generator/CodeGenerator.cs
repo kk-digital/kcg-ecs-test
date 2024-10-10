@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Jenny.Generator
 {
@@ -76,7 +77,7 @@ namespace Jenny.Generator
             {
                 if (_cancel) return Array.Empty<CodeGenFile>();
                 progress += 1;
-                OnProgress?.Invoke($"{messagePrefix}Pre Processing", preProcessor.Name, (float)progress / total);
+                OnProgress?.Invoke($"{messagePrefix}Pre Processing", $"{preProcessor}", (float)progress / total);
                 preProcessor.PreProcess();
             }
 
@@ -85,8 +86,18 @@ namespace Jenny.Generator
             {
                 if (_cancel) return Array.Empty<CodeGenFile>();
                 progress += 1;
-                OnProgress?.Invoke($"{messagePrefix}Creating model", dataProvider.Name, (float)progress / total);
-                data.AddRange(dataProvider.GetData());
+                var providedData = dataProvider.GetData();
+                var info = new StringBuilder();
+                info.Append($"{dataProvider} create {providedData.Length} models");
+                if (providedData.Length > 0)
+                {
+                    info.AppendLine(":");
+                    info.AppendJoin("\n", providedData.SelectMany(d => d.Keys.Select(k => $" - {k} : {d[k]}")));
+                    //info += $":\n{providedData.Select(d => $" - {d.Keys}")}";
+                }
+
+                OnProgress?.Invoke($"{messagePrefix}Creating model", info.ToString(), (float)progress / total);
+                data.AddRange(providedData);
             }
 
             var files = new List<CodeGenFile>();
@@ -95,8 +106,16 @@ namespace Jenny.Generator
             {
                 if (_cancel) return Array.Empty<CodeGenFile>();
                 progress += 1;
-                OnProgress?.Invoke($"{messagePrefix}Creating files", generator.Name, (float)progress / total);
-                files.AddRange(generator.Generate(dataArray));
+                var genFiles = generator.Generate(dataArray);
+                var info = new StringBuilder();
+                info.Append($"{generator} generate {genFiles.Length} files");
+                if(genFiles.Length > 0)
+                {
+                    info.AppendLine(":");
+                    info.AppendJoin("\n", genFiles.Select(f => $" - {f.FileName}"));
+                }
+                OnProgress?.Invoke($"{messagePrefix}Creating files", info.ToString(), (float)progress / total);
+                files.AddRange(genFiles);
             }
 
             var generatedFiles = files.ToArray();
@@ -104,7 +123,7 @@ namespace Jenny.Generator
             {
                 if (_cancel) return Array.Empty<CodeGenFile>();
                 progress += 1;
-                OnProgress?.Invoke($"{messagePrefix}Post Processing", postProcessor.Name, (float)progress / total);
+                OnProgress?.Invoke($"{messagePrefix}Post Processing", $"{postProcessor}", (float)progress / total);
                 generatedFiles = postProcessor.PostProcess(generatedFiles);
             }
 
