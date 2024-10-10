@@ -22,6 +22,9 @@ public static class CustomGenerationApp
         SetupLogger();
 
         var preferences = InitializePreferences();
+        preferences.SetTargetDirectory("../../../../src/generated");
+        preferences.SetContexts("Game,Particle,Vehicle");
+        preferences.SetEntityAssembly("../../../../src/bin/Debug/net7.0/kcg-ecs-test.dll");
 
         var codeGenerator = CodeGeneratorUtil.CodeGeneratorFromPreferences(preferences);
 

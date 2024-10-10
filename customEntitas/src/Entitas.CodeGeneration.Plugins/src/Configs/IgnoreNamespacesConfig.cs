@@ -14,7 +14,7 @@ namespace Entitas.CodeGeneration.Plugins
 
         public bool ignoreNamespaces
         {
-            get => _preferences[IGNORE_NAMESPACES_KEY] == "true";
+            get => bool.Parse(_preferences[IGNORE_NAMESPACES_KEY]);
             set => _preferences[IGNORE_NAMESPACES_KEY] = value.ToString();
         }
     }
