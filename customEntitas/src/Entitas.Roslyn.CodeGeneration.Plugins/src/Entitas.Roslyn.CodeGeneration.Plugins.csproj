@@ -13,12 +13,11 @@
   <ItemGroup>
     <PackageReference Include="DesperateDevs.Roslyn" Version="1.0.0" />
     <PackageReference Include="DesperateDevs.Serialization" Version="2.0.0" />
-    <PackageReference Include="Jenny" Version="1.0.3" />
-    <PackageReference Include="Jenny.Plugins" Version="1.0.0" />
     <PackageReference Include="Jenny.Plugins.Roslyn" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Jenny\src\Jenny.Plugins\Jenny.Plugins.csproj" />
     <ProjectReference Include="..\..\Entitas.CodeGeneration.Attributes\src\Entitas.CodeGeneration.Attributes.csproj" />
     <ProjectReference Include="..\..\Entitas.CodeGeneration.Plugins\src\Entitas.CodeGeneration.Plugins.csproj" />
     <ProjectReference Include="..\..\Entitas\src\Entitas.csproj" />
