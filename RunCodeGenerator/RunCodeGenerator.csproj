@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,7 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Sherlog.Appenders" Version="1.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\customEntitas\src\Entitas.CodeGeneration.Plugins\src\Entitas.CodeGeneration.Plugins.csproj" />
     <ProjectReference Include="..\customEntitas\src\Entitas.Roslyn.CodeGeneration.Plugins\src\Entitas.Roslyn.CodeGeneration.Plugins.csproj" />
+    <ProjectReference Include="..\Jenny\src\Jenny.Plugins\Jenny.Plugins.csproj" />
   </ItemGroup>
 
 </Project>
