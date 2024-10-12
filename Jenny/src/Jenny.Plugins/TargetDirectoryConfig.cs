@@ -13,7 +13,7 @@ namespace Jenny.Plugins
             {_targetDirectoryKey, "Assets"}
         };
 
-        public string TargetDirectory => _preferences[_targetDirectoryKey].ToSafeDirectory();
+        public string TargetDirectory => _preferences[_targetDirectoryKey];
     }
 
     public static class TargetDirectoryStringExtension

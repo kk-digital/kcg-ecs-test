@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,9 +28,14 @@ namespace Jenny.Plugins
                 }
             }
 
-            return files
+            var resultFiles = files
                 .Where(file => file != null)
                 .ToArray();
+
+            Console.WriteLine($"\nMergeFilesPostProcessor:");
+            Console.WriteLine(
+                $"Source files: {files.Length}. Result files: {resultFiles.Length}. Merged files: {files.Length - resultFiles.Length}.\n");
+            return resultFiles;
         }
     }
 }

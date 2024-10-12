@@ -1,4 +1,5 @@
-﻿using DesperateDevs.Serialization;
+﻿using System.Collections.Generic;
+using DesperateDevs.Serialization;
 
 namespace MyProject.CodeGenerator
 {
@@ -18,5 +19,11 @@ namespace MyProject.CodeGenerator
         {
             preferences["Jenny.Plugins.ProjectPath"] = projectPath;
         }
+
+        public static void SetExcludedDirs(this Preferences preferences, string excludedDirs)
+        {
+            preferences["Jenny.Plugins.ExcludedDirs"] = excludedDirs;
+        }
+        
     }
 }

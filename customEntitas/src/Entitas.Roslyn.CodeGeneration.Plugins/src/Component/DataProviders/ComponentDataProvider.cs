@@ -7,6 +7,7 @@ using DesperateDevs.Roslyn;
 using DesperateDevs.Serialization;
 using Entitas.CodeGeneration.Attributes;
 using Entitas.CodeGeneration.Plugins;
+using Entitas.Roslyn.CodeGeneration.Plugins.Utils;
 using Microsoft.CodeAnalysis;
 
 namespace Entitas.Roslyn.CodeGeneration.Plugins
@@ -81,20 +82,19 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
 
         public CodeGeneratorData[] GetData()
         {
-            var types = _types ?? Jenny.Plugins.Roslyn.PluginUtil
-                .GetCachedProjectParser(ObjectCache, _projectPathConfig.ProjectPath)
-                .GetTypes();
+            var types = _types ?? new FileParser(_projectPathConfig.ProjectPath, _projectPathConfig.ExcludedDirs).GetTypesFromDirectoryAsync()
+                .Result;
 
-            var componentInterface = typeof(IComponent).ToCompilableString();
+            var componentInterface = "IComponent";
 
             var dataFromComponents = types
-                .Where(type => type.AllInterfaces.Any(i => i.ToCompilableString() == componentInterface))
+                .Where(type => type.BaseType.ToCompilableString() == componentInterface)
                 .Where(type => !type.IsAbstract)
                 .Select(createDataForComponent)
                 .ToArray();
 
             var dataFromNonComponents = types
-                .Where(type => !type.AllInterfaces.Any(i => i.ToCompilableString() == componentInterface))
+                .Where(type => type.BaseType.ToCompilableString() != componentInterface)
                 .Where(type => !type.IsGenericType)
                 .Where(symbol => hasContexts(symbol))
                 .SelectMany(symbol => createDataForNonComponent(symbol))
