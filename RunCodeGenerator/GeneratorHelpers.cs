@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using DesperateDevs.Serialization;
+﻿using DesperateDevs.Serialization;
 
 namespace MyProject.CodeGenerator
 {
@@ -24,6 +23,10 @@ namespace MyProject.CodeGenerator
         {
             preferences["Jenny.Plugins.ExcludedDirs"] = excludedDirs;
         }
-        
+
+        public static void SetNamespace(this Preferences preferences, string @namespace)
+        {
+            preferences["Jenny.Plugins.Namespace"] = @namespace;
+        }
     }
 }
