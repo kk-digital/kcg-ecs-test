@@ -11,6 +11,7 @@ namespace MyProject.CodeGenerator;
 
 public static class CustomGenerationApp
 {
+    // Logger instance for logging information during the generation process
     static readonly Logger _logger = Logger.GetLogger(typeof(CustomGenerationApp));
 
     public static void Main(string[] args)
@@ -18,29 +19,65 @@ public static class CustomGenerationApp
         var watch = new Stopwatch();
         watch.Start();
 
-        SetupLogger();
+        SetupLogger();  // Set up logging to console and file
 
-        var preferences = InitializePreferences();
-        preferences.SetTargetDirectory("../../../../src/generated");
-        preferences.SetContexts("Game,Particle,Vehicle");
-        preferences.SetProjectPath("../../../../src");
-        preferences.SetExcludedDirs("generated");
+        var preferences = InitializePreferences();  // Initialize preferences for code generation
 
-        var codeGenerator = CodeGeneratorUtil.CodeGeneratorFromPreferences(preferences);
-
-        codeGenerator.OnProgress += (title, info, progress) =>
+        // Define generation configurations
+        var genConfig1 = new GenerationConfig
         {
-            var p = (int)(progress * 100);
-
-            _logger.Info($"{p}%: {title}. {info}.");
+            TargetDirectory = "../../../../src/generated1",
+            Contexts = "Game",
+            EntitasDir = "../../../../src",
+            ExcludedDirs = "generated, generated1, generated2, generated3, particles, vehicle",
+            Namespace = "Test.Namespace.Game"
         };
 
-        var generatedFiles = codeGenerator.Generate();
-        watch.Stop();
+        var genConfig2 = new GenerationConfig
+        {
+            TargetDirectory = "../../../../src/generated2",
+            Contexts = "Particle",
+            EntitasDir = "../../../../src/particles",
+            ExcludedDirs = "",
+            Namespace = "Test.Namespace.Particle"
+        };
 
-        _logger.Info($"[{DateTime.Now.ToLongTimeString()}] Generated {generatedFiles.Length} files in {(watch.ElapsedMilliseconds / 1000f):0.0} seconds");
+        var genConfig3 = new GenerationConfig
+        {
+            TargetDirectory = "../../../../src/generated3",
+            Contexts = "Vehicle",
+            EntitasDir = "../../../../src/vehicle",
+            ExcludedDirs = "",
+            Namespace = "Test.Namespace.Vehicle"
+        };
+
+        // List of generation configurations to iterate over
+        var configs = new[] { genConfig1, genConfig2, genConfig3 };
+
+        foreach (var generationConfig in configs)
+        {
+            generationConfig.ApplyPreferences(preferences);  // Apply preferences based on the current generation configuration
+
+            var codeGenerator = CodeGeneratorUtil.CodeGeneratorFromPreferences(preferences);  // Create code generator from preferences
+
+            // Subscribe to progress events during code generation
+            codeGenerator.OnProgress += (title, info, progress) =>
+            {
+                var p = (int)(progress * 100);
+                _logger.Info($"{p}%: {title}. {info}.");
+            };
+
+            // Generate the code and measure the time taken
+            var generatedFiles = codeGenerator.Generate();
+            watch.Restart();
+
+            _logger.Info($"[{DateTime.Now.ToLongTimeString()}] Generated {generatedFiles.Length} files in {(watch.ElapsedMilliseconds / 1000f):0.0} seconds");
+        }
+
+        watch.Stop();
     }
 
+    // Method to initialize preferences for code generation
     private static Preferences InitializePreferences()
     {
         var preferencesDic = new Dictionary<string, string>
@@ -58,25 +95,27 @@ public static class CustomGenerationApp
             },
             {
                 "Jenny.PostProcessors",
-                "Jenny.Plugins.AddFileHeaderPostProcessor, Jenny.Plugins.CleanTargetDirectoryPostProcessor, Jenny.Plugins.MergeFilesPostProcessor, Jenny.Plugins.WriteToDiskPostProcessor, Jenny.Plugins.ConsoleWriteLinePostProcessor"
+                "Jenny.Plugins.AddFileHeaderPostProcessor, Jenny.Plugins.CleanTargetDirectoryPostProcessor, Jenny.Plugins.MergeFilesPostProcessor, Jenny.Plugins.AddNamespacePostProcessor, Jenny.Plugins.WriteToDiskPostProcessor, Jenny.Plugins.ConsoleWriteLinePostProcessor"
             },
             { "Entitas.CodeGeneration.Plugins.IgnoreNamespaces", "false" }
         };
 
-        var preferencesPath = Path.GetTempFileName();
+        var preferencesPath = Path.GetTempFileName();  // Create a temporary file for preferences
         using (var writer = new StreamWriter(preferencesPath))
         {
             foreach (var kvp in preferencesDic)
             {
+                // Write each preference key-value pair to the temporary file
                 writer.WriteLine($"{kvp.Key} = {kvp.Value.Replace(",", ", \\\r                ")}");
             }
         }
 
         _logger.Debug($"Created temp preferences file: {preferencesPath}");
 
-        return new Preferences(preferencesPath, null);
+        return new Preferences(preferencesPath, null);  // Return a Preferences instance initialized with the temporary file
     }
 
+    // Method to set up the logger for console and file output
     private static void SetupLogger()
     {
         // Add colorful console messages
@@ -90,9 +129,9 @@ public static class CustomGenerationApp
             { LogLevel.Fatal, ConsoleColor.Magenta },
         });
 
-        Logger.AddAppender(consoleAppender.WriteLine);
+        Logger.AddAppender(consoleAppender.WriteLine);  // Add console appender to the logger
 
-        var fileAppender = new FileWriterAppender("generation.log");
-        Logger.AddAppender(fileAppender.WriteLine);
+        var fileAppender = new FileWriterAppender("generation.log");  // Create file appender for logging to a file
+        Logger.AddAppender(fileAppender.WriteLine);  // Add file appender to the logger
     }
 }
