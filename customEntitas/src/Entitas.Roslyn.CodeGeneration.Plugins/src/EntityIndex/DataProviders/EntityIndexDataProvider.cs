@@ -9,6 +9,7 @@ using DesperateDevs.Serialization;
 using Entitas.CodeGeneration.Attributes;
 using Entitas.CodeGeneration.Plugins;
 using Microsoft.CodeAnalysis;
+using Entitas.Roslyn.CodeGeneration.Plugins.Utils;
 
 namespace Entitas.Roslyn.CodeGeneration.Plugins
 {
@@ -49,9 +50,8 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
 
         public CodeGeneratorData[] GetData()
         {
-            var types = _types ?? Jenny.Plugins.Roslyn.PluginUtil
-                .GetCachedProjectParser(ObjectCache, _projectPathConfig.ProjectPath)
-                .GetTypes();
+            var types = _types ?? new FileParser(_projectPathConfig.ProjectPath, _projectPathConfig.ExcludedDirs).GetTypesFromDirectoryAsync()
+                .Result;
 
             var componentInterface = typeof(IComponent).ToCompilableString();
 

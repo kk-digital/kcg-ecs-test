@@ -11,6 +11,7 @@ namespace Jenny.Plugins
 
         public CodeGenFile[] PostProcess(CodeGenFile[] files)
         {
+            Console.WriteLine($"\nGenerated files:");
             Console.WriteLine(files.Aggregate(
                 string.Empty,
                 (acc, file) => $"{acc}{file.FileName} - {file.GeneratorName}\n")

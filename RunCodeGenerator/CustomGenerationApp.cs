@@ -23,7 +23,8 @@ public static class CustomGenerationApp
         var preferences = InitializePreferences();
         preferences.SetTargetDirectory("../../../../src/generated");
         preferences.SetContexts("Game,Particle,Vehicle");
-        preferences.SetProjectPath("../../../../src/kcg-ecs-test.csproj");
+        preferences.SetProjectPath("../../../../src");
+        preferences.SetExcludedDirs("generated");
 
         var codeGenerator = CodeGeneratorUtil.CodeGeneratorFromPreferences(preferences);
 
@@ -46,7 +47,7 @@ public static class CustomGenerationApp
         {
             { "Jenny.SearchPaths", "." },
             { "Jenny.Plugins", "Entitas.CodeGeneration.Plugins, Jenny.Plugins, Entitas.Roslyn.CodeGeneration.Plugins" },
-            { "Jenny.PreProcessors", "Jenny.Plugins.ValidateProjectPathPreProcessor" },
+            { "Jenny.PreProcessors", "" },
             {
                 "Jenny.DataProviders",
                 "Entitas.CodeGeneration.Plugins.ContextDataProvider, Entitas.Roslyn.CodeGeneration.Plugins.CleanupDataProvider, Entitas.Roslyn.CodeGeneration.Plugins.ComponentDataProvider, Entitas.Roslyn.CodeGeneration.Plugins.EntityIndexDataProvider"
