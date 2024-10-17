@@ -46,10 +46,10 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
             var types = _types ?? new FileParser(_projectPathConfig.ProjectPath, _projectPathConfig.ExcludedDirs).GetTypesFromDirectoryAsync()
                 .Result;
 
-            var componentInterface = typeof(IComponent).ToCompilableString();
+            var componentInterface = "IComponent";
 
             var cleanupTypes = types
-                .Where(type => type.AllInterfaces.Any(i => i.ToCompilableString() == componentInterface))
+                .Where(type => type.BaseType.ToCompilableString() == componentInterface)
                 .Where(type => !type.IsAbstract)
                 .Where(type => type.GetAttribute<CleanupAttribute>() != null)
                 .ToArray();

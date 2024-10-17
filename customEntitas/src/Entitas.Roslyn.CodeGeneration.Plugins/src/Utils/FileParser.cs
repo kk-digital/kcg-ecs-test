@@ -58,6 +58,15 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
 
             var project = workspace.AddProject(projectInfo);
 
+            // Add assemblies as metadata references
+            var references = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => !a.IsDynamic && File.Exists(a.Location))
+                .Select(a => MetadataReference.CreateFromFile(a.Location))
+                .Cast<MetadataReference>()
+                .ToList();
+
+            project = project.AddMetadataReferences(references);
+
             // Get all .cs files from the directory
             var csFiles = GetFilesWithExcludedDirectories(_directoryPath, _excludedDirs);
 
@@ -130,38 +139,6 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
                 if (typeSymbol != null)
                 {
                     namedTypeSymbols.Add(typeSymbol);  // Add the symbol to the list
-                }
-            }
-
-            return namedTypeSymbols.ToArray();
-        }
-
-        // Analyze documents and get INamedTypeSymbols without compiling
-        private async Task<INamedTypeSymbol[]> AnalyzeDocumentsAsync(Project project)
-        {
-            var namedTypeSymbols = new System.Collections.Generic.List<INamedTypeSymbol>();
-
-            // Iterate through each document in the project
-            foreach (var document in project.Documents)
-            {
-                var semanticModel = await document.GetSemanticModelAsync();  // Get the semantic model for the document
-                if (semanticModel == null) continue;
-
-                var syntaxRoot = await document.GetSyntaxRootAsync();  // Get the syntax tree's root
-                if (syntaxRoot == null) continue;
-
-                // Get all type declarations (class, struct, interface) from the syntax tree
-                var typeDeclarations = syntaxRoot.DescendantNodes()
-                    .OfType<Microsoft.CodeAnalysis.CSharp.Syntax.TypeDeclarationSyntax>();
-
-                // For each type declaration, get the corresponding INamedTypeSymbol
-                foreach (var typeDeclaration in typeDeclarations)
-                {
-                    var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
-                    if (typeSymbol != null)
-                    {
-                        namedTypeSymbols.Add(typeSymbol);  // Add the symbol to the list
-                    }
                 }
             }
 
