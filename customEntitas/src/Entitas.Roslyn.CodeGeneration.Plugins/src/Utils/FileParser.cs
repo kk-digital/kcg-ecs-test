@@ -75,17 +75,30 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
                 var fileContent = await File.ReadAllTextAsync(filePath);  // Read file content
                 var sourceText = SourceText.From(fileContent);
 
-                // Add the file as a document to the project
-                var documentInfo = DocumentInfo.Create(
-                    DocumentId.CreateNewId(project.Id),
-                    Path.GetFileName(filePath),
-                    null,
-                    SourceCodeKind.Regular,
-                    TextLoader.From(TextAndVersion.Create(sourceText, VersionStamp.Create())),
-                    filePath);
+                project = project.AddDocument(filePath, sourceText).Project;
+            }
 
-                var document = workspace.AddDocument(documentInfo);
-                namedTypeSymbols.AddRange(await AnalyzeDocumentsAsync(document));
+            var compilation = await project.GetCompilationAsync();
+            if (compilation == null)
+            {
+                Console.WriteLine("Failed to get compilation.");
+                return namedTypeSymbols.ToArray();
+            }
+
+            foreach (var syntaxTree in compilation.SyntaxTrees)
+            {
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var root = await syntaxTree.GetRootAsync();
+
+                var typeDeclarations = root.DescendantNodes()
+                    .OfType<Microsoft.CodeAnalysis.CSharp.Syntax.TypeDeclarationSyntax>();
+
+                foreach (var typeDeclaration in typeDeclarations)
+                {
+                    var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
+                    if (typeSymbol != null)
+                        namedTypeSymbols.Add(typeSymbol);
+                }
             }
 
             return namedTypeSymbols.ToArray();
@@ -115,34 +128,6 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
                     }
                 }
             }
-        }
-
-        // Analyze documents and get INamedTypeSymbols without compiling
-        private async Task<INamedTypeSymbol[]> AnalyzeDocumentsAsync(Document document)
-        {
-            var namedTypeSymbols = new System.Collections.Generic.List<INamedTypeSymbol>();
-
-            var semanticModel = await document.GetSemanticModelAsync();  // Get the semantic model for the document
-            if (semanticModel == null) return namedTypeSymbols.ToArray();
-
-            var syntaxRoot = await document.GetSyntaxRootAsync();  // Get the syntax tree's root
-            if (syntaxRoot == null) return namedTypeSymbols.ToArray();
-
-            // Get all type declarations (class, struct, interface) from the syntax tree
-            var typeDeclarations = syntaxRoot.DescendantNodes()
-                .OfType<Microsoft.CodeAnalysis.CSharp.Syntax.TypeDeclarationSyntax>();
-
-            // For each type declaration, get the corresponding INamedTypeSymbol
-            foreach (var typeDeclaration in typeDeclarations)
-            {
-                var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
-                if (typeSymbol != null)
-                {
-                    namedTypeSymbols.Add(typeSymbol);  // Add the symbol to the list
-                }
-            }
-
-            return namedTypeSymbols.ToArray();
         }
     }
 }
