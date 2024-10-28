@@ -63,7 +63,7 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
         public string[] GetContextNamesOrDefault(INamedTypeSymbol type)
         {
             var contextNames = GetContextNames(type);
-            if (contextNames.Length == 0)
+            if (contextNames.Length == 0 && _contextNamesConfig.contextNames.Length > 0)
                 contextNames = new[] {_contextNamesConfig.contextNames[0]};
 
             return contextNames;

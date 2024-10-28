@@ -8,11 +8,11 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
 {
     public class MemberDataComponentDataProvider : IComponentDataProvider
     {
-        readonly string _componentInterface = "IComponent";
+        readonly string _componentInterface = typeof(IComponent).ToCompilableString();
 
         public void Provide(INamedTypeSymbol type, ComponentData data)
         {
-            var isComponent = type.BaseType.ToCompilableString() == _componentInterface;
+            var isComponent = type.AllInterfaces.Any(i => i.ToCompilableString() == _componentInterface);
             var memberData = type.GetPublicMembers(isComponent)
                 .Select(createMemberData)
                 .ToArray();

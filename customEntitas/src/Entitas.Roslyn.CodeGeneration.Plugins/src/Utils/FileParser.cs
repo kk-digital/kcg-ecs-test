@@ -58,15 +58,6 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
 
             var project = workspace.AddProject(projectInfo);
 
-            // Add assemblies as metadata references
-            var references = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => !a.IsDynamic && File.Exists(a.Location))
-                .Select(a => MetadataReference.CreateFromFile(a.Location))
-                .Cast<MetadataReference>()
-                .ToList();
-
-            project = project.AddMetadataReferences(references);
-
             // Get all .cs files from the directory
             var csFiles = GetFilesWithExcludedDirectories(_directoryPath, _excludedDirs);
 
