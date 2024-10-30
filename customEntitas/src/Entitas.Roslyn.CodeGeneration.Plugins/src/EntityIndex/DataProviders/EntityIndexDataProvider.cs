@@ -53,18 +53,21 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
             var types = _types ?? new FileParser(_projectPathConfig.ProjectPath, _projectPathConfig.ExcludedDirs).GetTypesFromDirectoryAsync()
                 .Result;
 
-            var componentInterface = "IComponent";
+            //var componentInterface = "IComponent";
+            var componentInterface = typeof(IComponent).ToCompilableString();
 
-            /*var entityIndexData = types
-                .Where(type => type.BaseType.ToCompilableString() == componentInterface)
+            var entityIndexData = types
+                //.Where(type => type.BaseType.ToCompilableString() == componentInterface)
+                .Where(type => type.AllInterfaces.Any(i => i.ToCompilableString() == componentInterface))
                 .Where(type => !type.IsAbstract)
                 .ToDictionary(
                     type => type,
                     type => type.GetPublicMembers(true))
-                .Where(kv => kv.Value.Any(symbol => symbol.GetAttribute<PrimaryEntityIndexAttribute>() != null))
-                .SelectMany(kv => createEntityIndexData(kv.Key, kv.Value));*/
+                //.Where(kv => kv.Value.Any(symbol => symbol.GetAttribute<PrimaryEntityIndexAttribute>() != null))
+                .Where(kv => kv.Value.Any(symbol => symbol.GetAttribute<AbstractEntityIndexAttribute>(true) != null))
+                .SelectMany(kv => createEntityIndexData(kv.Key, kv.Value));
 
-            var entityIndexData = GetEntityIndexData(types, componentInterface);
+            //var entityIndexData = GetEntityIndexData(types, componentInterface);
 
             var customEntityIndexData = types
                 .Where(type => !type.IsAbstract)
@@ -141,7 +144,7 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
 
         EntityIndexData[] createEntityIndexData(INamedTypeSymbol type, ISymbol[] members)
         {
-            var hasMultiple = members.Count(member => member.GetAttributeFix<PrimaryEntityIndexAttribute>() != null) > 1;
+            /*var hasMultiple = members.Count(member => member.GetAttributeFix<PrimaryEntityIndexAttribute>() != null) > 1;
             return members
                 .Where(member => member.GetAttributeFix<PrimaryEntityIndexAttribute>() != null)
                 .Select(member =>
@@ -159,10 +162,30 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
                     data.SetContextNames(_contextsComponentDataProvider.GetContextNamesOrDefault(type));
 
                     return data;
+                }).ToArray();*/
+
+            var hasMultiple = members.Count(member => member.GetAttribute<AbstractEntityIndexAttribute>(true) != null) > 1;
+            return members
+                .Where(member => member.GetAttribute<AbstractEntityIndexAttribute>(true) != null)
+                .Select(member =>
+                {
+                    var data = new EntityIndexData();
+                    var attribute = member.GetAttribute<AbstractEntityIndexAttribute>(true);
+
+                    data.SetEntityIndexType(getEntityIndexType(attribute));
+                    data.IsCustom(false);
+                    data.SetEntityIndexName(type.ToCompilableString().ToComponentName(_ignoreNamespacesConfig.ignoreNamespaces));
+                    data.SetHasMultiple(hasMultiple);
+                    data.SetKeyType(member.PublicMemberType().ToCompilableString());
+                    data.SetComponentType(type.ToCompilableString());
+                    data.SetMemberName(member.Name);
+                    data.SetContextNames(_contextsComponentDataProvider.GetContextNamesOrDefault(type));
+
+                    return data;
                 }).ToArray();
         }
 
-        EntityIndexData createCustomEntityIndexData(INamedTypeSymbol type)
+        /*EntityIndexData createCustomEntityIndexData(INamedTypeSymbol type)
         {
             var data = new EntityIndexData();
             var attribute = type.GetAttributeFix<CustomEntityIndexAttribute>();
@@ -196,9 +219,45 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
             data.SetCustomMethods(getMethods);
 
             return data;
+        }*/
+
+        EntityIndexData createCustomEntityIndexData(INamedTypeSymbol type)
+        {
+            var data = new EntityIndexData();
+            var attribute = type.GetAttribute<CustomEntityIndexAttribute>();
+            data.SetEntityIndexType(type.ToCompilableString());
+            data.IsCustom(true);
+            data.SetEntityIndexName(type.ToCompilableString().RemoveDots());
+            data.SetHasMultiple(false);
+            data.SetContextNames(new[]
+            {
+                ((INamedTypeSymbol)attribute.ConstructorArguments.First().Value)
+                .ToCompilableString()
+                .TypeName()
+                .RemoveContextSuffix()
+            });
+
+            var getMethods = type
+                .GetMembers()
+                .OfType<IMethodSymbol>()
+                .Where(method => method.DeclaredAccessibility == Accessibility.Public)
+                .Where(method => !method.IsStatic)
+                .Where(method => method.GetAttribute<EntityIndexGetMethodAttribute>() != null)
+                .Select(method => new MethodData(
+                    method.ReturnType.ToCompilableString(),
+                    method.Name,
+                    method.Parameters
+                        .Select(p => new MemberData(p.ToCompilableString(), p.Name))
+                        .ToArray()
+                ))
+                .ToArray();
+
+            data.SetCustomMethods(getMethods);
+
+            return data;
         }
 
-        string getEntityIndexType(AttributeData attribute)
+        /*string getEntityIndexType(AttributeData attribute)
         {
             var entityIndexType = attribute.ToString();
             switch (entityIndexType)
@@ -206,6 +265,20 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
                 case "EntityIndex":
                     return "Entitas.EntityIndex";
                 case "PrimaryEntityIndex":
+                    return "Entitas.PrimaryEntityIndex";
+                default:
+                    throw new Exception($"Unhandled EntityIndexType: {entityIndexType}");
+            }
+        }*/
+
+        string getEntityIndexType(AttributeData attribute)
+        {
+            var entityIndexType = attribute.ToString();
+            switch (entityIndexType)
+            {
+                case "Entitas.CodeGeneration.Attributes.EntityIndexAttribute":
+                    return "Entitas.EntityIndex";
+                case "Entitas.CodeGeneration.Attributes.PrimaryEntityIndexAttribute":
                     return "Entitas.PrimaryEntityIndex";
                 default:
                     throw new Exception($"Unhandled EntityIndexType: {entityIndexType}");
