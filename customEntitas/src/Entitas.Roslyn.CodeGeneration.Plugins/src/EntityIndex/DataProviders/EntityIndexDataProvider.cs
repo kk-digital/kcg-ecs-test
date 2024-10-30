@@ -53,21 +53,16 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
             var types = _types ?? new FileParser(_projectPathConfig.ProjectPath, _projectPathConfig.ExcludedDirs).GetTypesFromDirectoryAsync()
                 .Result;
 
-            //var componentInterface = "IComponent";
             var componentInterface = typeof(IComponent).ToCompilableString();
 
             var entityIndexData = types
-                //.Where(type => type.BaseType.ToCompilableString() == componentInterface)
                 .Where(type => type.AllInterfaces.Any(i => i.ToCompilableString() == componentInterface))
                 .Where(type => !type.IsAbstract)
                 .ToDictionary(
                     type => type,
                     type => type.GetPublicMembers(true))
-                //.Where(kv => kv.Value.Any(symbol => symbol.GetAttribute<PrimaryEntityIndexAttribute>() != null))
                 .Where(kv => kv.Value.Any(symbol => symbol.GetAttribute<AbstractEntityIndexAttribute>(true) != null))
                 .SelectMany(kv => createEntityIndexData(kv.Key, kv.Value));
-
-            //var entityIndexData = GetEntityIndexData(types, componentInterface);
 
             var customEntityIndexData = types
                 .Where(type => !type.IsAbstract)
@@ -79,91 +74,8 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
                 .ToArray();
         }
 
-        // Method to process entity index data without using LINQ
-        public IEnumerable<EntityIndexData> GetEntityIndexData(IEnumerable<INamedTypeSymbol> types, string componentInterface)
-        {
-            var result = new List<EntityIndexData>();
-
-            // First filter: Where type.BaseType.ToCompilableString() == componentInterface
-            var filteredTypes = new List<INamedTypeSymbol>();
-            foreach (var type in types)
-            {
-                if (type.BaseType != null && type.BaseType.ToCompilableString() == componentInterface)
-                {
-                    filteredTypes.Add(type);
-                }
-            }
-
-            // Second filter: Where type is not abstract
-            var nonAbstractTypes = new List<INamedTypeSymbol>();
-            foreach (var type in filteredTypes)
-            {
-                if (!type.IsAbstract)
-                {
-                    nonAbstractTypes.Add(type);
-                }
-            }
-
-            // Create dictionary: ToDictionary(type => type, type => type.GetPublicMembers(true))
-            var typeMemberDictionary = new Dictionary<INamedTypeSymbol, IEnumerable<ISymbol>>();
-            foreach (var type in nonAbstractTypes)
-            {
-                var publicMembers = type.GetPublicMembers(true);
-                typeMemberDictionary.Add(type, publicMembers);
-            }
-
-            // Filter dictionary: Where kv.Value contains PrimaryEntityIndexAttribute
-            var filteredDictionary = new Dictionary<INamedTypeSymbol, IEnumerable<ISymbol>>();
-            bool containsPrimaryEntityIndexAttribute = false;
-            foreach (var kv in typeMemberDictionary)
-            {
-                foreach (var symbol in kv.Value)
-                {
-                    if (symbol.GetAttributeFix<PrimaryEntityIndexAttribute>() != null)
-                    {
-                        containsPrimaryEntityIndexAttribute = true;
-                        break;
-                    }
-                }
-
-                if (containsPrimaryEntityIndexAttribute)
-                {
-                    filteredDictionary.Add(kv.Key, kv.Value);
-                }
-            }
-
-            // SelectMany: Create entity index data from each dictionary entry
-            foreach (var kv in filteredDictionary)
-            {
-                var entityIndexData = createEntityIndexData(kv.Key, kv.Value.ToArray());
-                result.AddRange(entityIndexData);
-            }
-
-            return result;
-        }
-
         EntityIndexData[] createEntityIndexData(INamedTypeSymbol type, ISymbol[] members)
         {
-            /*var hasMultiple = members.Count(member => member.GetAttributeFix<PrimaryEntityIndexAttribute>() != null) > 1;
-            return members
-                .Where(member => member.GetAttributeFix<PrimaryEntityIndexAttribute>() != null)
-                .Select(member =>
-                {
-                    var data = new EntityIndexData();
-                    var attribute = member.GetAttributeFix<PrimaryEntityIndexAttribute>();
-
-                    data.SetEntityIndexType(getEntityIndexType(attribute));
-                    data.IsCustom(false);
-                    data.SetEntityIndexName(type.ToCompilableString().ToComponentName(_ignoreNamespacesConfig.ignoreNamespaces));
-                    data.SetHasMultiple(hasMultiple);
-                    data.SetKeyType(member.PublicMemberType().ToCompilableString());
-                    data.SetComponentType(type.ToCompilableString());
-                    data.SetMemberName(member.Name);
-                    data.SetContextNames(_contextsComponentDataProvider.GetContextNamesOrDefault(type));
-
-                    return data;
-                }).ToArray();*/
-
             var hasMultiple = members.Count(member => member.GetAttribute<AbstractEntityIndexAttribute>(true) != null) > 1;
             return members
                 .Where(member => member.GetAttribute<AbstractEntityIndexAttribute>(true) != null)
@@ -184,42 +96,6 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
                     return data;
                 }).ToArray();
         }
-
-        /*EntityIndexData createCustomEntityIndexData(INamedTypeSymbol type)
-        {
-            var data = new EntityIndexData();
-            var attribute = type.GetAttributeFix<CustomEntityIndexAttribute>();
-            data.SetEntityIndexType(type.ToCompilableString());
-            data.IsCustom(true);
-            data.SetEntityIndexName(type.ToCompilableString().RemoveDots());
-            data.SetHasMultiple(false);
-            data.SetContextNames(new[]
-            {
-                ((INamedTypeSymbol)attribute.ConstructorArguments.First().Value)
-                .ToCompilableString()
-                .TypeName()
-                .RemoveContextSuffix()
-            });
-
-            var getMethods = type
-                .GetMembers()
-                .OfType<IMethodSymbol>()
-                .Where(method => method.DeclaredAccessibility == Accessibility.Public)
-                .Where(method => !method.IsStatic)
-                .Where(method => method.GetAttributeFix<EntityIndexGetMethodAttribute>() != null)
-                .Select(method => new MethodData(
-                    method.ReturnType.ToCompilableString(),
-                    method.Name,
-                    method.Parameters
-                        .Select(p => new MemberData(p.ToCompilableString(), p.Name))
-                        .ToArray()
-                ))
-                .ToArray();
-
-            data.SetCustomMethods(getMethods);
-
-            return data;
-        }*/
 
         EntityIndexData createCustomEntityIndexData(INamedTypeSymbol type)
         {
@@ -256,20 +132,6 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
 
             return data;
         }
-
-        /*string getEntityIndexType(AttributeData attribute)
-        {
-            var entityIndexType = attribute.ToString();
-            switch (entityIndexType)
-            {
-                case "EntityIndex":
-                    return "Entitas.EntityIndex";
-                case "PrimaryEntityIndex":
-                    return "Entitas.PrimaryEntityIndex";
-                default:
-                    throw new Exception($"Unhandled EntityIndexType: {entityIndexType}");
-            }
-        }*/
 
         string getEntityIndexType(AttributeData attribute)
         {

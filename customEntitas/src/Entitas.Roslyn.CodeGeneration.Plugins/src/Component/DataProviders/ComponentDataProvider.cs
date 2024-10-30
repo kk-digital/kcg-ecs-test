@@ -85,19 +85,16 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
             var types = _types ?? new FileParser(_projectPathConfig.ProjectPath, _projectPathConfig.ExcludedDirs).GetTypesFromDirectoryAsync()
                 .Result;
 
-            //var componentInterface = "IComponent";
             var componentInterface = typeof(IComponent).ToCompilableString();
 
             var dataFromComponents = types
-                //.Where(type => type.BaseType.ToCompilableString() == componentInterface)
                 .Where(type => type.AllInterfaces.Any(i => i.ToCompilableString() == componentInterface))
                 .Where(type => !type.IsAbstract)
                 .Select(createDataForComponent)
                 .ToArray();
 
             var dataFromNonComponents = types
-               // .Where(type => type.BaseType.ToCompilableString() != componentInterface)
-                .Where(type => type.BaseType.ToCompilableString() != componentInterface)
+                .Where(type => !type.AllInterfaces.Any(i => i.ToCompilableString() == componentInterface))
                 .Where(type => !type.IsGenericType)
                 .Where(symbol => hasContexts(symbol))
                 .SelectMany(symbol => createDataForNonComponent(symbol))

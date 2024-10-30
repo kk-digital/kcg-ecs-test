@@ -10,11 +10,7 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
     {
         public void Provide(INamedTypeSymbol type, ComponentData data)
         {
-            //var componentInterface = "IComponent";
-
-            //var shouldGenerateComponent = type.BaseType.ToCompilableString() != componentInterface;
             var shouldGenerateComponent = !type.AllInterfaces.Any(i => i.ToCompilableString() == typeof(IComponent).ToCompilableString());
-
             data.ShouldGenerateComponent(shouldGenerateComponent);
             if (shouldGenerateComponent)
                 data.SetObjectTypeName(type.ToCompilableString());

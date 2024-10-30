@@ -2,7 +2,6 @@
 using DesperateDevs.Extensions;
 using DesperateDevs.Roslyn;
 using Entitas.CodeGeneration.Plugins;
-using Entitas.Roslyn.CodeGeneration.Plugins.Utils;
 using Microsoft.CodeAnalysis;
 
 namespace Entitas.Roslyn.CodeGeneration.Plugins
@@ -14,7 +13,7 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
         public void Provide(INamedTypeSymbol type, ComponentData data)
         {
             var isComponent = type.AllInterfaces.Any(i => i.ToCompilableString() == _componentInterface);
-            var memberData = type.GetPublicMembersFix(isComponent)
+            var memberData = type.GetPublicMembers(isComponent)
                 .Select(createMemberData)
                 .ToArray();
 
@@ -22,6 +21,6 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
         }
 
         MemberData createMemberData(ISymbol member) =>
-            new MemberData(member.PublicMemberTypeFix().ToCompilableString(), member.Name);
+            new MemberData(member.PublicMemberType().ToCompilableString(), member.Name);
     }
 }
