@@ -82,7 +82,7 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
 
         public CodeGeneratorData[] GetData()
         {
-            var types = _types ?? new FileParser(_projectPathConfig.ProjectPath, _projectPathConfig.ExcludedDirs).GetTypesFromDirectoryAsync()
+            var types = _types ?? new FileParser(_projectPathConfig).GetTypesFromDirectoryAsync()
                 .Result;
 
             var componentInterface = typeof(IComponent).ToCompilableString();

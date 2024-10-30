@@ -28,5 +28,11 @@ namespace MyProject.CodeGenerator
         {
             preferences["Jenny.Plugins.Namespace"] = @namespace;
         }
+
+        public static void SetProjectFilePath(this Preferences preferences, string projectFilePath)
+        {
+            preferences["Jenny.Plugins.SearchPaths"] = projectFilePath;
+        }
+        
     }
 }

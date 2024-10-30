@@ -6,20 +6,16 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Jenny.Plugins;
 
 namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
 {
-    public class FileParser
+    public class FileParser(ProjectPathConfig projectPathConfig)
     {
-        private readonly string _directoryPath;
-        private readonly string[] _excludedDirs;
+        private readonly string _directoryPath = projectPathConfig.ProjectPath;
+        private readonly string _searchPaths = projectPathConfig.SearchPaths;
+        private readonly string[] _excludedDirs = projectPathConfig.ExcludedDirs.Split(",");
         private INamedTypeSymbol[]? _types; // Nullable to support the nullability feature
-
-        public FileParser(string directoryPath, string excludedDirs)
-        {
-            _directoryPath = directoryPath;
-            _excludedDirs = excludedDirs.Split(",");
-        }
 
         // Method to get types from the provided .cs files
         public async Task<INamedTypeSymbol[]> GetTypesFromDirectoryAsync()
@@ -65,6 +61,9 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
                 .Cast<MetadataReference>()
                 .ToList();
 
+            var projReferences = await AdhocWorkspaceHelper.LoadProjectWithDependenciesAsync(_searchPaths);
+
+            references.AddRange(projReferences);
             project = project.AddMetadataReferences(references);
 
             // Get all .cs files from the directory
