@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis;
 
 namespace Jenny.Generator
 {
@@ -35,27 +37,21 @@ namespace Jenny.Generator
             _objectCache = new Dictionary<string, object>();
         }
 
-        public CodeGenFile[] DryRun() => Generate(
-            "[Dry Run] ",
-            _preProcessors.Where(i => i.RunInDryMode).ToArray(),
-            _dataProviders.Where(i => i.RunInDryMode).ToArray(),
-            _codeGenerators.Where(i => i.RunInDryMode).ToArray(),
-            _postProcessors.Where(i => i.RunInDryMode).ToArray()
-        );
-
-        public CodeGenFile[] Generate() => Generate(
+        public CodeGenFile[] Generate(IEnumerable<MetadataReference> projReferences) => Generate(
             string.Empty,
             _preProcessors,
             _dataProviders,
             _codeGenerators,
-            _postProcessors
+            _postProcessors,
+            projReferences
         );
 
         CodeGenFile[] Generate(string messagePrefix,
             IPreProcessor[] preProcessors,
             IDataProvider[] dataProviders,
             ICodeGenerator[] codeGenerators,
-            IPostProcessor[] postProcessors)
+            IPostProcessor[] postProcessors, 
+            IEnumerable<MetadataReference> projReferences)
         {
             _cancel = false;
 
@@ -86,7 +82,7 @@ namespace Jenny.Generator
             {
                 if (_cancel) return Array.Empty<CodeGenFile>();
                 progress += 1;
-                var providedData = dataProvider.GetData();
+                var providedData = dataProvider.GetData(projReferences);
                 var info = new StringBuilder();
                 info.Append($"{dataProvider} create {providedData.Length} models");
                 if (providedData.Length > 0)

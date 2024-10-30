@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Jenny;
 using DesperateDevs.Serialization;
+using Microsoft.CodeAnalysis;
 
 namespace Entitas.CodeGeneration.Plugins
 {
@@ -20,7 +21,7 @@ namespace Entitas.CodeGeneration.Plugins
             _contextNamesConfig.Configure(preferences);
         }
 
-        public CodeGeneratorData[] GetData() => _contextNamesConfig.contextNames
+        public CodeGeneratorData[] GetData(IEnumerable<MetadataReference> projReferences) => _contextNamesConfig.contextNames
             .Select(contextName =>
             {
                 var data = new ContextData();

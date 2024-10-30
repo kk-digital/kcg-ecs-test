@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="DesperateDevs.Serialization" Version="2.*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.3.0" />
     <PackageReference Include="Sherlog" Version="1.*" />
   </ItemGroup>
 
