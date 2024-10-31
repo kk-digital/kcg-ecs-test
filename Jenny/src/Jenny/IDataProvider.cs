@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using Microsoft.CodeAnalysis;
-
-namespace Jenny
+﻿namespace Jenny
 {
     public interface IDataProvider : ICodeGenerationPlugin
     {
-        CodeGeneratorData[] GetData(IEnumerable<MetadataReference> projReferences);
+        CodeGeneratorData[] GetData();
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using Jenny;
 using Jenny.Plugins;
 using DesperateDevs.Extensions;
+using DesperateDevs.Roslyn;
 using DesperateDevs.Serialization;
 using Entitas.CodeGeneration.Attributes;
 using Entitas.CodeGeneration.Plugins;
@@ -79,9 +80,9 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins
             _ignoreNamespacesConfig.Configure(preferences);
         }
 
-        public CodeGeneratorData[] GetData(IEnumerable<MetadataReference> projReferences)
+        public CodeGeneratorData[] GetData()
         {
-            var types = _types ?? new FileParser(_projectPathConfig, projReferences).GetTypesFromDirectoryAsync()
+            var types = _types ?? new FileParser(_projectPathConfig).GetTypesFromDirectoryAsync()
                 .Result;
 
             var componentInterface = typeof(IComponent).ToCompilableString();

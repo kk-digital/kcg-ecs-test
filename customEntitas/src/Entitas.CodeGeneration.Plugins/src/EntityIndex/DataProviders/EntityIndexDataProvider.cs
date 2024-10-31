@@ -8,7 +8,6 @@ using DesperateDevs.Extensions;
 using DesperateDevs.Reflection;
 using DesperateDevs.Serialization;
 using Entitas.CodeGeneration.Attributes;
-using Microsoft.CodeAnalysis;
 
 namespace Entitas.CodeGeneration.Plugins
 {
@@ -49,7 +48,7 @@ namespace Entitas.CodeGeneration.Plugins
             _contextsComponentDataProvider.Configure(preferences);
         }
 
-        public CodeGeneratorData[] GetData(IEnumerable<MetadataReference> projReferences)
+        public CodeGeneratorData[] GetData()
         {
             var types = _types ?? PluginUtil
                 .GetCachedAssemblyResolver(ObjectCache, _assembliesConfig.assemblies, _codeGeneratorConfig.SearchPaths)

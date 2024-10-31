@@ -10,9 +10,10 @@ using Jenny.Plugins;
 
 namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
 {
-    public class FileParser(ProjectPathConfig projectPathConfig, IEnumerable<MetadataReference> projReferences)
+    public class FileParser(ProjectPathConfig projectPathConfig)
     {
         private readonly string _directoryPath = projectPathConfig.ProjectPath;
+        private readonly string _searchPaths = projectPathConfig.SearchPaths;
         private readonly string[] _excludedDirs = projectPathConfig.ExcludedDirs.Split(",");
         private INamedTypeSymbol[]? _types; // Nullable to support the nullability feature
 
@@ -59,7 +60,9 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
                 .Select(a => MetadataReference.CreateFromFile(a.Location))
                 .Cast<MetadataReference>()
                 .ToList();
-            
+
+            var projReferences = await AdhocWorkspaceHelper.LoadProjectWithDependenciesAsync(_searchPaths);
+
             references.AddRange(projReferences);
             project = project.AddMetadataReferences(references);
 

@@ -2,14 +2,19 @@
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.CodeAnalysis.Host.Mef;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Build.Locator;
-using System;
 
 public static class AdhocWorkspaceHelper
 {
+    public static Dictionary<string, List<MetadataReference>> References = new();
+
     public static async Task<IEnumerable<MetadataReference>> LoadProjectWithDependenciesAsync(string projectPath)
     {
+        if(References.ContainsKey(projectPath))
+            return References[projectPath];
+
         // Register MSBuild, which is required to read project files (.csproj)
         if (!MSBuildLocator.IsRegistered)
         {
@@ -24,7 +29,8 @@ public static class AdhocWorkspaceHelper
 
             if (compilation != null)
             {
-                var metadataReferences = compilation.References;
+                var metadataReferences = compilation.References.ToList();
+                References.Add(projectPath, metadataReferences);
 
                 return metadataReferences;
             }

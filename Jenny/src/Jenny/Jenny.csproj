@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <PackageReference Include="DesperateDevs.Extensions" Version="3.*" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.3.0" />
   </ItemGroup>
 
 </Project>
