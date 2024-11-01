@@ -1,4 +1,6 @@
 
+using Vehicle;
+
 namespace Particle
 {
     public class ParticleSpawnerSystem
@@ -6,7 +8,7 @@ namespace Particle
         public static ParticleEntity Spawn(ParticleContext entitasContext)
         {
             ParticleEntity entity = entitasContext.CreateEntity();
-            entity.AddParticleBase(-1);
+            entity.AddParticleBase(-0, new VehicleEntity());
             
             entity.AddParticleSprite2D(0, null, 0, 1, 1);
             entity.AddParticleAnimation(

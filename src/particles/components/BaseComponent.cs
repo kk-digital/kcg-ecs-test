@@ -1,4 +1,5 @@
 using Entitas;
+using Vehicle;
 
 namespace Particle
 {
@@ -6,5 +7,7 @@ namespace Particle
     public class BaseComponent : IComponent
     {
         public int Index;
+
+        public VehicleEntity vehicle;
     }
 }

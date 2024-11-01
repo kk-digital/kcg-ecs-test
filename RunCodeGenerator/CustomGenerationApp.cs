@@ -23,36 +23,28 @@ public static class CustomGenerationApp
 
         var preferences = InitializePreferences();  // Initialize preferences for code generation
 
-        // Define generation configurations
-        var genConfig1 = new GenerationConfig
+        GenerationConfig vehicleConfig = new GenerationConfig
         {
-            TargetDirectory = "../../../../src/generated1",
-            Contexts = "Game",
-            EntitasDir = "../../../../src",
-            ExcludedDirs = "generated, generated1, generated2, generated3, particles, vehicle",
-            Namespace = "Test.Namespace.Game"
-        };
-
-        var genConfig2 = new GenerationConfig
-        {
-            TargetDirectory = "../../../../src/generated2",
+            ProjectFilePath = "../../../../src/kcg-ecs-test.csproj",
+            TargetDirectory = "../../../../src/particles/generated",
             Contexts = "Particle",
             EntitasDir = "../../../../src/particles",
             ExcludedDirs = "",
-            Namespace = "Test.Namespace.Particle"
+            Namespace = "Particle"
         };
 
-        var genConfig3 = new GenerationConfig
+        GenerationConfig particleConfig = new GenerationConfig
         {
-            TargetDirectory = "../../../../src/generated3",
+            ProjectFilePath = "../../../../src/kcg-ecs-test.csproj",
+            TargetDirectory = "../../../../src/vehicle/generated",
             Contexts = "Vehicle",
             EntitasDir = "../../../../src/vehicle",
             ExcludedDirs = "",
-            Namespace = "Test.Namespace.Vehicle"
+            Namespace = "Vehicle"
         };
 
         // List of generation configurations to iterate over
-        var configs = new[] { genConfig1, genConfig2, genConfig3 };
+        GenerationConfig[] configs = new[] { particleConfig, vehicleConfig };
 
         foreach (var generationConfig in configs)
         {

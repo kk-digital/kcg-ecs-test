@@ -1,11 +1,13 @@
 using System;
 using Entitas;
+using Entitas.CodeGeneration.Attributes;
 
 namespace Vehicle
 {
     [Vehicle]
     public class BaseComponent : IComponent
     {
+        [PrimaryEntityIndex]
         public Int64 Id;
         public float Durability;
         public bool EngineRunning; // If vehicle's thrusters running mapState
