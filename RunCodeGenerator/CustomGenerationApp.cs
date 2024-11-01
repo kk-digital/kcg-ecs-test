@@ -21,36 +21,38 @@ public static class CustomGenerationApp
 
         SetupLogger();  // Set up logging to console and file
 
-        Preferences preferences = InitializePreferences();  // Initialize preferences for code generation
-        
+        var preferences = InitializePreferences();  // Initialize preferences for code generation
+
+        // Define generation configurations
         var genConfig1 = new GenerationConfig
         {
-            TargetDirectory = "../../../../src/generatedEcs",
-            Contexts        = "Game",
-            EntitasDir      = "../../../../src",
-            ExcludedDirs    = "particles, vehicle",
-            Namespace       = "GeneratedEcs"
+            TargetDirectory = "../../../../src/generated1",
+            Contexts = "Game",
+            EntitasDir = "../../../../src",
+            ExcludedDirs = "generated, generated1, generated2, generated3, particles, vehicle",
+            Namespace = "Test.Namespace.Game"
         };
 
-        GenerationConfig genConfigParticle = new GenerationConfig
+        var genConfig2 = new GenerationConfig
         {
-            TargetDirectory = "../../../../src/particles/generated",
+            TargetDirectory = "../../../../src/generated2",
             Contexts = "Particle",
             EntitasDir = "../../../../src/particles",
-            ExcludedDirs = "generated",
-            Namespace = "Particle"
+            ExcludedDirs = "",
+            Namespace = "Test.Namespace.Particle"
         };
 
-        GenerationConfig genConfigVehicle = new GenerationConfig
+        var genConfig3 = new GenerationConfig
         {
-            TargetDirectory = "../../../../src/vehicle/generated",
+            TargetDirectory = "../../../../src/generated3",
             Contexts = "Vehicle",
             EntitasDir = "../../../../src/vehicle",
             ExcludedDirs = "",
-            Namespace = "Vehicle" };
+            Namespace = "Test.Namespace.Vehicle"
+        };
 
         // List of generation configurations to iterate over
-        var configs = new[] { genConfigParticle, genConfigVehicle };
+        var configs = new[] { genConfig1, genConfig2, genConfig3 };
 
         foreach (var generationConfig in configs)
         {
