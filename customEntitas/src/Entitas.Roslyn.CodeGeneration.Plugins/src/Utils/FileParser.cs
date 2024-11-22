@@ -68,13 +68,14 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
                 .Select(location => MetadataReference.CreateFromFile(location))
                 .ToList();
 
-            // Load project references including dependencies
-            //var projReferences = await AdhocWorkspaceHelper.LoadProjectWithDependenciesAsync(_searchPaths);
-
-            //references.AddRange(projReferences);
             project = project.AddMetadataReferences(references);
 
-            var types = PluginUtil.GetCachedProjectParser(ObjectCache, _searchPaths).GetTypes();
+            INamedTypeSymbol[] types;
+            if (!GlobalTypeCache.SearchPathTypeCache.TryGetValue(_searchPaths, out types))
+            {
+                types = PluginUtil.GetCachedProjectParser(ObjectCache, _searchPaths).GetTypes();
+                GlobalTypeCache.SearchPathTypeCache[_searchPaths] = types;
+            }
 
             // Get all .cs files from the directory
             var csFiles = GetFilesWithExcludedDirectories(_directoryPath, _excludedDirs);
