@@ -6,6 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Globalization;
+using System.Threading;
+using Entitas.CodeGeneration.Attributes;
 using Jenny.Plugins;
 
 namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
@@ -16,6 +20,8 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
         private readonly string _searchPaths = projectPathConfig.SearchPaths;
         private readonly string[] _excludedDirs = projectPathConfig.ExcludedDirs.Split(",");
         private INamedTypeSymbol[]? _types; // Nullable to support the nullability feature
+        public Dictionary<string, object> ObjectCache { get; set; } = new Dictionary<string, object>();
+        // Using global type mappings from GlobalTypeCache
 
         // Method to get types from the provided .cs files
         public async Task<INamedTypeSymbol[]> GetTypesFromDirectoryAsync()
@@ -57,14 +63,18 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
             // Add assemblies as metadata references
             var references = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => !a.IsDynamic && File.Exists(a.Location))
-                .Select(a => MetadataReference.CreateFromFile(a.Location))
-                .Cast<MetadataReference>()
+                .Select(a => a.Location)
+                .Distinct()
+                .Select(location => MetadataReference.CreateFromFile(location))
                 .ToList();
 
-            var projReferences = await AdhocWorkspaceHelper.LoadProjectWithDependenciesAsync(_searchPaths);
+            // Load project references including dependencies
+            //var projReferences = await AdhocWorkspaceHelper.LoadProjectWithDependenciesAsync(_searchPaths);
 
-            references.AddRange(projReferences);
+            //references.AddRange(projReferences);
             project = project.AddMetadataReferences(references);
+
+            var types = PluginUtil.GetCachedProjectParser(ObjectCache, _searchPaths).GetTypes();
 
             // Get all .cs files from the directory
             var csFiles = GetFilesWithExcludedDirectories(_directoryPath, _excludedDirs);
@@ -96,7 +106,34 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
                 {
                     var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
                     if (typeSymbol != null)
-                        namedTypeSymbols.Add(typeSymbol);
+                    {
+                        // Process all members to ensure proper namespace resolution
+                        foreach (var member in typeSymbol.GetMembers())
+                        {
+                            if (member is IFieldSymbol fieldSymbol)
+                            {
+                                var fieldType = fieldSymbol.Type;
+                                // Ensure proper namespace resolution for field types
+                                var containingNamespace = fieldType.ContainingNamespace;
+                                if (containingNamespace == null || containingNamespace.IsGlobalNamespace)
+                                {
+                                    // Search for the type in loaded types collection
+                                    var matchingType = types.FirstOrDefault(t =>
+                                        t.Name.Equals(fieldType.Name, StringComparison.OrdinalIgnoreCase) &&
+                                        !t.ContainingNamespace.IsGlobalNamespace);
+
+                                    if (matchingType != null)
+                                    {
+                                        GlobalTypeCache.TypeMappings[fieldSymbol] = (matchingType, typeSymbol);
+                                        GlobalTypeCache.NameToTypeMap[matchingType.Name] = matchingType;
+                                    }
+                                }
+                            }
+                        }
+
+                        if(!namedTypeSymbols.Contains(typeSymbol))
+                            namedTypeSymbols.Add(typeSymbol);
+                    }
                 }
             }
 
