@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using DesperateDevs.Serialization;
+using Entitas.CodeGeneration.Attributes;
 using Jenny.Generator;
 using Sherlog;
 using Sherlog.Appenders;
@@ -48,6 +49,7 @@ public static class CustomGenerationApp
 
         foreach (var generationConfig in configs)
         {
+            GlobalTypeCache.Clear();
             generationConfig.ApplyPreferences(preferences);  // Apply preferences based on the current generation configuration
 
             var codeGenerator = CodeGeneratorUtil.CodeGeneratorFromPreferences(preferences);  // Create code generator from preferences
