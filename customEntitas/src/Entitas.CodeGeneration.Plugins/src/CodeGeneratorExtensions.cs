@@ -19,7 +19,7 @@ namespace Entitas.CodeGeneration.Plugins
             data.GetTypeName().ToComponentName(ignoreNamespaces);
 
         public static string ComponentNameValidLowerFirst(this ComponentData data) =>
-            ComponentName(data).ToLowerFirst().AddPrefixIfIsKeyword();
+            $"{ComponentName(data).ToLowerFirst()}Component"; //.AddPrefixIfIsKeyword();
 
         public static string ComponentNameWithContext(this ComponentData data, string contextName) =>
             contextName + data.ComponentName();
