@@ -43,7 +43,30 @@ namespace Entitas.Roslyn.CodeGeneration.Plugins.Utils
         public INamedTypeSymbol[] GetTypes()
         {
             if (this._types == null)
-                this._types = this._project.GetCompilationAsync().Result.GetSymbolsWithName((Func<string, bool>)(name => true), SymbolFilter.Type).OfType<INamedTypeSymbol>().ToArray<INamedTypeSymbol>();
+            {
+                var compilation = this._project.GetCompilationAsync().Result;
+                var types = new List<INamedTypeSymbol>();
+
+                // Get types from the current project
+                types.AddRange(compilation.GetSymbolsWithName((Func<string, bool>)(name => true), SymbolFilter.Type)
+                    .OfType<INamedTypeSymbol>());
+
+                // Get types from referenced assemblies
+                foreach (var reference in compilation.References)
+                {
+                    var assemblySymbol = compilation.GetAssemblyOrModuleSymbol(reference) as IAssemblySymbol;
+                    if (assemblySymbol != null)
+                    {
+                        var assemblyTypes = assemblySymbol.GlobalNamespace
+                            .GetNamespaceMembers()
+                            .SelectMany(ns => ns.GetTypeMembers())
+                            .Where(t => !t.IsAbstract && !t.IsGenericType);
+                        types.AddRange(assemblyTypes);
+                    }
+                }
+
+                this._types = types.ToArray();
+            }
             return this._types;
         }
     }
