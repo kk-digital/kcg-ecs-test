@@ -11,7 +11,7 @@ public partial class VehicleEntity {
     public Vehicle.BaseComponent vehicleBase { get { return (Vehicle.BaseComponent)GetComponent(VehicleComponentsLookup.VehicleBase); } }
     public bool hasVehicleBase { get { return HasComponent(VehicleComponentsLookup.VehicleBase); } }
 
-    public void AddVehicleBase(long newId, float newDurability, bool newEngineRunning, bool newStartingProcedure, bool newEndingProcedure, bool newCanPilot, bool newIsDestroyed) {
+    public void AddVehicleBase(Int64 newId, float newDurability, bool newEngineRunning, bool newStartingProcedure, bool newEndingProcedure, bool newCanPilot, bool newIsDestroyed) {
         var index = VehicleComponentsLookup.VehicleBase;
         var component = (Vehicle.BaseComponent)CreateComponent(index, typeof(Vehicle.BaseComponent));
         component.Id = newId;
@@ -24,7 +24,7 @@ public partial class VehicleEntity {
         AddComponent(index, component);
     }
 
-    public void ReplaceVehicleBase(long newId, float newDurability, bool newEngineRunning, bool newStartingProcedure, bool newEndingProcedure, bool newCanPilot, bool newIsDestroyed) {
+    public void ReplaceVehicleBase(Int64 newId, float newDurability, bool newEngineRunning, bool newStartingProcedure, bool newEndingProcedure, bool newCanPilot, bool newIsDestroyed) {
         var index = VehicleComponentsLookup.VehicleBase;
         var component = (Vehicle.BaseComponent)CreateComponent(index, typeof(Vehicle.BaseComponent));
         component.Id = newId;
